@@ -1,0 +1,50 @@
+Database Schema
+1. Products
+product_id (INT, PRIMARY KEY, AUTO_INCREMENT) : Unique identifier for each product.
+name (VARCHAR(255)) : Name of the product (e.g., "Espresso", "Cappuccino", "Croissant").
+description (TEXT) : Optional detailed description of the product.
+category (VARCHAR(255)) : Category the product belongs to (e.g., "Coffee", "Pastries", "Sandwiches").
+price (DECIMAL(10,2)) : Price of the product.
+image_url (VARCHAR(255)) : URL to an image of the product (optional).
+active (BOOLEAN) : Flag indicating if the product is currently available for sale (true/false).
+2. Ingredients
+ingredient_id (INT, PRIMARY KEY, AUTO_INCREMENT) : Unique identifier for each ingredient.
+name (VARCHAR(255)) : Name of the ingredient (e.g., "Espresso Beans", "Milk", "Sugar").
+unit (VARCHAR(255)) : Unit of measurement for the ingredient (e.g., "grams", "ml", "pieces").
+cost_per_unit (DECIMAL(10,2)) : Cost of the ingredient per unit.
+stock_quantity (INT) : Current quantity of the ingredient in stock.
+reorder_level (INT) : Minimum stock level that triggers a reorder.
+3. Recipes
+recipe_id (INT, PRIMARY KEY, AUTO_INCREMENT) : Unique identifier for each recipe.
+product_id (INT) : Foreign key referencing the Products table.
+ingredient_id (INT) : Foreign key referencing the Ingredients table.
+quantity (DECIMAL(10,2)) : Quantity of the ingredient required for the recipe.
+4. Orders
+order_id (INT, PRIMARY KEY, AUTO_INCREMENT) : Unique identifier for each order.
+order_date (DATETIME) : Date and time the order was placed.
+customer_name (VARCHAR(255)) : Name of the customer (optional).
+order_status (VARCHAR(255)) : Status of the order (e.g., "Pending", "Preparing", "Completed").
+total_amount (DECIMAL(10,2)) : Total amount of the order.
+payment_method (VARCHAR(255)) : Method of payment used (e.g., "Cash", "Card", "Mobile Pay").
+5. Order Items
+order_item_id (INT, PRIMARY KEY, AUTO_INCREMENT) : Unique identifier for each item in an order.
+order_id (INT) : Foreign key referencing the Orders table.
+product_id (INT) : Foreign key referencing the Products table.
+quantity (INT) : Quantity of the product ordered.
+price (DECIMAL(10,2)) : Price of the product at the time of the order.
+6. Employees
+employee_id (INT, PRIMARY KEY, AUTO_INCREMENT) : Unique identifier for each employee.
+first_name (VARCHAR(255)) : First name of the employee.
+last_name (VARCHAR(255)) : Last name of the employee.
+role (VARCHAR(255)) : Role of the employee (e.g., "Barista", "Cashier", "Manager").
+username (VARCHAR(255)) : Username for login.
+password (VARCHAR(255)) : Hashed password for login.
+7. Discounts
+discount_id (INT, PRIMARY KEY, AUTO_INCREMENT) : Unique identifier for each discount.
+name (VARCHAR(255)) : Name of the discount (e.g., "Student Discount", "Happy Hour").
+discount_type (VARCHAR(255)) : Type of discount (e.g., "Percentage", "Fixed Amount").
+discount_value (DECIMAL(10,2)) : Value of the discount (e.g., 10% or $5).
+start_date (DATETIME) : Start date of the discount (optional).
+end_date (DATETIME) : End date of the discount (optional).
+8. Inventory
+inventory_id (INT, PRIMARY KEY, AUTO_INCREMENT) : Unique
