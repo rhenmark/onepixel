@@ -42,3 +42,7 @@ export type CategoryFormStateProps = {
     categories: string[];
     setCategories: Dispatch<SetStateAction<string[]>>
 }
+
+export type ProductTableProps = {
+    onBack: () => void
+}

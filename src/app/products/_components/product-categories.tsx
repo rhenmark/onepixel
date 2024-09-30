@@ -7,6 +7,7 @@ import { Plus } from "lucide-react";
 import AddCategory from "./add-category";
 import { CategoryDataType } from "../_types/product.types";
 import { useGetCategories } from "../_hooks/useProducts";
+import { useSelector } from "react-redux";
 
 
 const columns: TableColumnsType<CategoryDataType> = [
@@ -47,8 +48,8 @@ const onChange: TableProps<CategoryDataType>["onChange"] = (
 const ProductCategories: React.FC = () => {
   const [open, setOpen] = useState(false)
   const onOpenClose = () => setOpen((prev) => !prev)
-  const { data, loading } = useGetCategories()
-
+  const { loading } = useGetCategories()
+  const data = useSelector((state) => state.products.productCategories)
   
   return (
     <div>
@@ -64,7 +65,10 @@ const ProductCategories: React.FC = () => {
         loading={loading}
         rowKey={"id"}
       />
-      <AddCategory open={open} onClose={onOpenClose} />
+      {
+        open && <AddCategory open={true} onClose={onOpenClose} />
+      }
+      
     </div>
   );
 };

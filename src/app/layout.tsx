@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { AntdRegistry } from '@ant-design/nextjs-registry';
+import StoreProvider from "@/lib/duxs/AppStoreProvider";
 
 
 const geistSans = localFont({
@@ -26,14 +27,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <AntdRegistry>
-          {children}
-        </AntdRegistry>
-      </body>
-    </html>
+   
+      <html lang="en">
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+           <StoreProvider>
+            <AntdRegistry>
+                {children}
+            </AntdRegistry>
+          </StoreProvider>
+        </body>
+      </html>
   );
 }

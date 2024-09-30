@@ -8,26 +8,6 @@ import { useAddCategories } from "../_hooks/useProducts";
 const AddCategory = ({ onClose, open }: AddProductCategoryProps) => {
   const [categories, setCategories] = useState<string[]>([]);
   const {loading, doAddCategory} = useAddCategories()
-
-  const handleSave = () => {
-    doAddCategory(categories)
-  }
-  
-  return (
-    <Drawer
-      title={"Add Category"}
-      onClose={onClose}
-      open={open}
-      size="large"
-      maskClosable={false}
-      footer={<Footer onClose={onClose} onClickSave={handleSave} loading={loading}/>}
-    >
-      <Form categories={categories} setCategories={setCategories} />
-    </Drawer>
-  );
-};
-
-const Form = ({categories, setCategories}: CategoryFormStateProps) => {
   const [isPopulated, setIsPopulated] = useState(false);
   const [inputCategory, setInputCategory] = useState("")
   const [notificationApi, contextHolder] = notification.useNotification();;
@@ -67,8 +47,28 @@ const Form = ({categories, setCategories}: CategoryFormStateProps) => {
     })
   }
 
+  const saveSuccessfully = () => {
+    onClose()
+    notification.success({
+      message: "Success",
+      description: "Added successfully"
+    })
+  }
+
+  const handleSave = () => {
+    doAddCategory(categories, saveSuccessfully)
+  }
+  
   return (
-    <div>
+    <Drawer
+      title={"Add Category"}
+      onClose={onClose}
+      open={open}
+      size="large"
+      maskClosable={false}
+      footer={<Footer onClose={onClose} onClickSave={handleSave} loading={loading}/>}
+    >
+      <div>
       {contextHolder}
       <form className="grid gap-4 grid-cols-[1fr_auto] justify-center items-center" onSubmit={handleAdd}>
         <div className="grid gap-2">
@@ -110,8 +110,11 @@ const Form = ({categories, setCategories}: CategoryFormStateProps) => {
         />
       </div>
     </div>
+
+    </Drawer>
   );
 };
+
 
 const Footer = ({ onClose, loading, onClickSave }: AddProductCategoryFooterProps) => {
   return (

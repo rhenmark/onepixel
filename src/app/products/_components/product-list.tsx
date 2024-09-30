@@ -5,6 +5,7 @@ import { FileSpreadsheet, Plus } from "lucide-react";
 import AddProduct from "./add-product";
 import { DataType, DrawerType } from "../_types/product.types";
 import { productListData } from "../_mock-data/mockdata";
+import { useSelector } from "react-redux";
 
 const columns: TableColumnsType<DataType> = [
   {
@@ -65,10 +66,12 @@ const onChange: TableProps<DataType>["onChange"] = (
 
 
 const ProductList: React.FC = () => {
+  const productCategories = useSelector((state) => state.products.productCategories);
   const [open, setOpen] = useState({
     show: false,
     type: ""
   });
+
 
   const onClick = (type: DrawerType) => setOpen((prev) => ({...prev, show: !prev.show, type}));
   const onClose = () => setOpen((prev) => ({...prev, show: !prev.show}));

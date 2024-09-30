@@ -1,26 +1,36 @@
 import { db } from "@/config/firebase/firebase-conf"
+import { setProductCategories } from "@/lib/duxs/feature/product/product"
 import { getDocs, collection, writeBatch, doc } from "firebase/firestore"
 import { useEffect, useState } from "react"
+import { useDispatch, useSelector } from "react-redux"
 
 export const useGetCategories = () => {
     const [loading, setLoading] = useState(true)
     const [data, setData] = useState<any>([])
-    const [_, refetch] = useState<boolean>()
+    const dispatch = useDispatch()
+    const categories = useSelector(state => state.products.productCategories)
 
-    useEffect(() => {
-        const fetchItems = async () => {
+    const fetchItems = async (force?: boolean) => {
+        if (!categories.length || force) {
             try {
                 const querySnapshot = await getDocs(collection(db, "category"))
                 const res = querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
                 setData(res)
                 setLoading(false)
+                dispatch(setProductCategories(res))
             } catch {
                 setLoading(false)
             }
-          }
-      
+        }
+      }
+
+    useEffect(() => {
           fetchItems()
-    }, [refetch])
+    }, [])
+
+    const refetch = () => {
+        fetchItems(true)
+    }
    
     return {
         loading, 
@@ -35,7 +45,7 @@ export const useAddCategories = () => {
     const [error, setError] = useState<null | string>()
     const {refetch} = useGetCategories()
 
-    const doAddCategory = async (categories: string[]) => {
+    const doAddCategory = async (categories: string[], cb: () => void) => {
         setLoading(true);
 
         const batch = writeBatch(db);  // Initialize batch write
@@ -50,7 +60,8 @@ export const useAddCategories = () => {
         // Commit the batch operation
         try {
           await batch.commit();
-          refetch(true)
+          refetch()
+          cb()
           console.log('Bulk data added successfully!');
         } catch (error) {
           console.error('Error adding bulk data: ', error);

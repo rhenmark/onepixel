@@ -3,15 +3,18 @@ import {
   Drawer,
   Input,
   InputNumber,
-  message,
   Select,
   Switch,
   UploadProps,
 } from "antd";
-import { AddProductProps } from "../_types/product.types";
-import { useMemo } from "react";
+import { AddProductProps, ProductTableProps } from "../_types/product.types";
+import { useMemo, useState } from "react";
 import Dragger from "antd/es/upload/Dragger";
 import { Download, Upload } from "lucide-react";
+import { useSelector } from "react-redux";
+import * as XLSX from "xlsx";
+import { useGetCategories } from "../_hooks/useProducts";
+
 const { TextArea } = Input;
 
 const AddProduct = ({ onClose, open, type }: AddProductProps) => {
@@ -38,6 +41,14 @@ const AddProduct = ({ onClose, open, type }: AddProductProps) => {
 };
 
 const Form = () => {
+  const categoryOptions = useSelector(
+    (state) => state.products.productCategories
+  )?.map((item) => ({
+    value: item.id,
+    label: item.name,
+  }));
+  const _ = useGetCategories();
+
   return (
     <div className="grid gap-4">
       <div className="grid gap-2">
@@ -57,20 +68,7 @@ const Form = () => {
           // onChange={onChange}
           // onSearch={onSearch}
           size="large"
-          options={[
-            {
-              value: "jack",
-              label: "Jack",
-            },
-            {
-              value: "lucy",
-              label: "Lucy",
-            },
-            {
-              value: "tom",
-              label: "Tom",
-            },
-          ]}
+          options={categoryOptions}
         />
       </div>
       <div className="grid gap-2">
@@ -85,49 +83,94 @@ const Form = () => {
   );
 };
 
-const props: UploadProps = {
-  name: "file",
-  multiple: false,
-  action: "https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload",
-  onChange(info) {
-    const { status } = info.file;
-    if (status !== "uploading") {
-      console.log(info.file, info.fileList);
-    }
-    if (status === "done") {
-      message.success(`${info.file.name} file uploaded successfully.`);
-    } else if (status === "error") {
-      message.error(`${info.file.name} file upload failed.`);
-    }
-  },
-  onDrop(e) {
-    console.log("Dropped files", e.dataTransfer.files);
-  },
-  maxCount: 1
-};
-
 const ImportForm = () => {
+  const [sheet, setSheet] = useState({
+    data: [],
+    step: 0,
+  });
+  const handleFileUpload = (file: Blob) => {
+    const reader = new FileReader();
+
+    // Process file after reading
+    reader.onload = (event) => {
+      const data = event.target.result;
+      const workbook = XLSX.read(data, { type: "binary" });
+      const sheetName = workbook.SheetNames[0]; // Get the first sheet
+      const sheet = workbook.Sheets[sheetName];
+
+      // Parse the sheet to JSON
+      const jsonData = XLSX.utils.sheet_to_json(sheet);
+      setSheet({
+        data: jsonData,
+        step: 1,
+      });
+      console.log("Parsed Data:", jsonData); // Handle your parsed data here
+    };
+
+    // Read file as binary string
+    reader.readAsBinaryString(file);
+
+    // Return false to prevent auto upload
+    return false;
+  };
+
+  const props: UploadProps = {
+    name: "file",
+    multiple: false,
+    onDrop(e) {
+      console.log("Dropped files", e.dataTransfer.files);
+    },
+    maxCount: 1,
+    accept: ".csv,.xlsx",
+    beforeUpload: handleFileUpload,
+  };
+
+  const handleBack = () => {
+    setSheet(state => ({...state, step: 0}))
+  }
+
   return (
     <div className="grid grid-rows-[auto_1fr] gap-6 h-full">
-      <div className="flex justify-end">
-        <Button className="!bg-black !text-white" size="large" icon={<Download />}>
-          Download sample file
-        </Button>
-      </div>
-      <Dragger {...props} className="!h-full">
-        <div className="grid place-items-center mb-4">
-          <Upload size={80} />
-        </div>
-        <p className="ant-upload-text">
-          Click or drag file to this area to upload
-        </p>
-        <p className="ant-upload-hint">
-          Support for a single Excel/CSV file upload. Please upload formatted
-          file only.
-        </p>
-      </Dragger>
+      {sheet.step === 0 ? (
+        <>
+          <div className="flex justify-end">
+            <Button
+              className="!bg-black !text-white"
+              size="large"
+              icon={<Download />}
+            >
+              Download sample file
+            </Button>
+          </div>
+          <Dragger {...props} className="h-[80%]">
+            <div className="grid place-items-center mb-4">
+              <Upload size={80} />
+            </div>
+            <p className="ant-upload-text">
+              Click or drag file to this area to upload
+            </p>
+            <p className="ant-upload-hint">
+              Support for a single Excel/CSV file upload. Please upload
+              formatted file only.
+            </p>
+          </Dragger>
+        </>
+      ) : (
+        <ProductTable onBack={handleBack} />
+      )}
     </div>
   );
+};
+
+const ProductTable = ({onBack}: ProductTableProps) => {
+  return (
+    <div className="flex flex-col gap-4">
+        <div>
+            <Button onClick={onBack}>Back</Button>
+        </div>
+        <div>Table here</div>
+    </div>
+  )
 };
 
 const Footer = ({ onClose }: Pick<AddProductProps, "onClose">) => {

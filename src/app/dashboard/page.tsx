@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 
 const mockRoutesList = [
   { name: "Store POS", route: "/store", icon: <Airplay size={80} /> },
-  { name: "Online Orders", route: "/products", icon: <PrinterCheck size={80} /> },
+  { name: "Online Orders", route: "/online-orders", icon: <PrinterCheck size={80} /> },
   { name: "Products", route: "/products", icon: <PackageOpen size={80} /> },
   { name: "Inventory", route: "/inventory", icon: <ScanBarcode size={80} /> },
   { name: "Reports", route: "/reports", icon: <PieChart size={80} /> },
@@ -26,7 +26,7 @@ const Dashboard = () => {
           <div className=" grid grid-cols-4 gap-8 gap-y-24">
           {mockRoutesList.map((item) => (
             <Card
-              className="h-[200px] w-[200px] grid grid-flow-row justify-center items-center gap-4"
+              className="h-[200px] w-[200px] grid grid-flow-row justify-center items-center gap-4 cursor-pointer hover:bg-red"
               onClick={() => onClick(item.route)}
               key={item.name}
             >
