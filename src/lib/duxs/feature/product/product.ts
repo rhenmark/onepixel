@@ -1,13 +1,28 @@
 import { createSlice } from '@reduxjs/toolkit'
-import type { PayloadAction } from '@reduxjs/toolkit'
 
-export interface CounterState {
-  productList: number,
-  productCategories?: string[]
+export interface ProductsState {
+  productList: ProductStateProps[],
+  productCategories?: ProductCategoryStateProps[]
 }
 
-const initialState: CounterState = {
-    productList: 0,
+export type ProductStateProps = {
+  category: string;
+  isAvailabe: boolean
+  itemType: string
+  name: string 
+  price: number
+  id: string
+}
+
+export type ProductCategoryStateProps = {
+    name: string;
+    id: string;
+    isActive?: boolean;
+}
+
+
+const initialState: ProductsState = {
+    productList: [],
     productCategories: []
 }
 
@@ -22,10 +37,13 @@ export const productSlice = createSlice({
       // immutable state based off those changes
       state.productCategories = action.payload
     },
+    setProductList: (state, action) => {
+      state.productList = action.payload
+    }
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { setProductCategories } = productSlice.actions
+export const { setProductCategories, setProductList } = productSlice.actions
 
 export default productSlice.reducer

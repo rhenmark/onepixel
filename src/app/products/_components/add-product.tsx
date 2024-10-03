@@ -4,7 +4,6 @@ import {
   Input,
   InputNumber,
   Select,
-  Switch,
   UploadProps,
 } from "antd";
 import { AddProductProps, ProductTableProps } from "../_types/product.types";
@@ -12,12 +11,24 @@ import { useMemo, useState } from "react";
 import Dragger from "antd/es/upload/Dragger";
 import { Download, Upload } from "lucide-react";
 import { useSelector } from "react-redux";
-import * as XLSX from "xlsx";
+import {read, utils} from "xlsx";
 import { useGetCategories } from "../_hooks/useProducts";
+import {
+  ProductCategoryStateProps,
+} from "@/lib/duxs/feature/product/product";
+import { RootState } from "@/lib/duxs/store";
+import { useForm } from "react-hook-form";
 
 const { TextArea } = Input;
 
 const AddProduct = ({ onClose, open, type }: AddProductProps) => {
+    const {
+        register,
+        handleSubmit,
+        watch,
+        formState: { errors },
+      } = useForm<FormInputs>()
+
   const drawerTitle = useMemo(() => {
     return type === "form" ? "Add New Product" : "Import Sheet";
   }, [type]);
@@ -27,23 +38,33 @@ const AddProduct = ({ onClose, open, type }: AddProductProps) => {
   }, [type]);
 
   return (
-    <Drawer
-      title={drawerTitle}
-      onClose={onClose}
-      open={open}
-      size="large"
-      maskClosable={false}
-      footer={<Footer onClose={onClose} />}
-    >
-      {formComponent}
-    </Drawer>
+    <form>
+        <Drawer
+        title={drawerTitle}
+        onClose={onClose}
+        open={open}
+        size="large"
+        maskClosable={false}
+        footer={<Footer onClose={onClose} onSubmit={handleSubmit} />}
+        >
+        {formComponent}
+        </Drawer>
+    </form>
   );
 };
 
+type FormInputs = {
+    name: string;
+    description: string;
+    // id reference to category
+    category: string;
+    price: number;
+}
+
 const Form = () => {
-  const categoryOptions = useSelector(
-    (state) => state.products.productCategories
-  )?.map((item) => ({
+  const categoryOptions =
+    useSelector((state: RootState) => state.products.productCategories) || [];
+  const options = categoryOptions?.map((item: ProductCategoryStateProps) => ({
     value: item.id,
     label: item.name,
   }));
@@ -68,17 +89,17 @@ const Form = () => {
           // onChange={onChange}
           // onSearch={onSearch}
           size="large"
-          options={categoryOptions}
+          options={options}
         />
       </div>
       <div className="grid gap-2">
         <span>Price</span>
         <InputNumber size="large" className="!w-full" placeholder="Price" />
       </div>
-      <div className="flex gap-2 mt-4">
+      {/* <div className="flex gap-2 mt-4">
         <span>Active</span>
         <Switch defaultChecked />
-      </div>
+      </div> */}
     </div>
   );
 };
@@ -94,12 +115,12 @@ const ImportForm = () => {
     // Process file after reading
     reader.onload = (event) => {
       const data = event.target.result;
-      const workbook = XLSX.read(data, { type: "binary" });
+      const workbook = read(data, { type: "binary" });
       const sheetName = workbook.SheetNames[0]; // Get the first sheet
       const sheet = workbook.Sheets[sheetName];
 
       // Parse the sheet to JSON
-      const jsonData = XLSX.utils.sheet_to_json(sheet);
+      const jsonData = utils.sheet_to_json(sheet);
       setSheet({
         data: jsonData,
         step: 1,
@@ -126,8 +147,8 @@ const ImportForm = () => {
   };
 
   const handleBack = () => {
-    setSheet(state => ({...state, step: 0}))
-  }
+    setSheet((state) => ({ ...state, step: 0 }));
+  };
 
   return (
     <div className="grid grid-rows-[auto_1fr] gap-6 h-full">
@@ -162,24 +183,29 @@ const ImportForm = () => {
   );
 };
 
-const ProductTable = ({onBack}: ProductTableProps) => {
+const ProductTable = ({ onBack }: ProductTableProps) => {
   return (
     <div className="flex flex-col gap-4">
-        <div>
-            <Button onClick={onBack}>Back</Button>
-        </div>
-        <div>Table here</div>
+      <div>
+        <Button onClick={onBack}>Back</Button>
+      </div>
+      <div>Table here</div>
     </div>
-  )
+  );
 };
 
-const Footer = ({ onClose }: Pick<AddProductProps, "onClose">) => {
+
+type FooterProps = Pick<AddProductProps, "onClose"> & {
+    onSubmit: () => void
+}
+
+const Footer = ({ onClose, onSubmit }: FooterProps) => {
   return (
     <div className="flex justify-end gap-4 h-16 px-4">
       <Button size="large" onClick={onClose}>
         Cancel
       </Button>
-      <Button size="large" type="primary">
+      <Button size="large" type="primary" htmlType="submit" onClick={onSubmit}>
         Submit
       </Button>
     </div>

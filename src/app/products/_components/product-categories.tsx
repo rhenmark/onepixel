@@ -8,6 +8,7 @@ import AddCategory from "./add-category";
 import { CategoryDataType } from "../_types/product.types";
 import { useGetCategories } from "../_hooks/useProducts";
 import { useSelector } from "react-redux";
+import { RootState } from "@/lib/duxs/store";
 
 
 const columns: TableColumnsType<CategoryDataType> = [
@@ -49,7 +50,7 @@ const ProductCategories: React.FC = () => {
   const [open, setOpen] = useState(false)
   const onOpenClose = () => setOpen((prev) => !prev)
   const { loading } = useGetCategories()
-  const data = useSelector((state) => state.products.productCategories)
+  const data = useSelector((state: RootState) => state.products.productCategories)
   
   return (
     <div>

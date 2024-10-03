@@ -1,61 +1,47 @@
+"use client"
+
 import React, { useState } from "react";
-import { Button, Table } from "antd";
+import { Button, Image, Skeleton, Table } from "antd";
 import type { TableColumnsType, TableProps } from "antd";
 import { FileSpreadsheet, Plus } from "lucide-react";
 import AddProduct from "./add-product";
-import { DataType, DrawerType } from "../_types/product.types";
-import { productListData } from "../_mock-data/mockdata";
-import { useSelector } from "react-redux";
+import {  DrawerType, ProductListDataType } from "../_types/product.types";
+import { useGetProductList } from "../_hooks/useProducts";
 
-const columns: TableColumnsType<DataType> = [
+const columns: TableColumnsType<ProductListDataType> = [
+  {
+    title: "Image",
+    dataIndex: "imageUrl",
+    render: (value) => {
+      return value?.url ? <Image src={value?.url} alt="image" height={100} /> : <Skeleton.Image active />
+    }
+  },
   {
     title: "Name",
     dataIndex: "name",
-    filters: [
-      {
-        text: "Joe",
-        value: "Joe",
-      },
-      {
-        text: "Category 1",
-        value: "Category 1",
-      },
-      {
-        text: "Category 2",
-        value: "Category 2",
-      },
-    ],
     filterMode: "tree",
     filterSearch: true,
     onFilter: (value, record) => record.name.startsWith(value as string),
     width: "30%",
   },
   {
-    title: "Age",
-    dataIndex: "age",
-    sorter: (a, b) => a.age - b.age,
+    title: "Category",
+    dataIndex: "category",
   },
   {
-    title: "Address",
-    dataIndex: "address",
-    filters: [
-      {
-        text: "London",
-        value: "London",
-      },
-      {
-        text: "New York",
-        value: "New York",
-      },
-    ],
-    onFilter: (value, record) => record.address.startsWith(value as string),
+    title: "Type",
+    dataIndex: "itemType",
     filterSearch: true,
-    width: "40%",
+  },
+  {
+    title: "Price",
+    dataIndex: "price",
+    filterSearch: true,
   },
 ];
 
 
-const onChange: TableProps<DataType>["onChange"] = (
+const onChange: TableProps<ProductListDataType>["onChange"] = (
   pagination,
   filters,
   sorter,
@@ -66,18 +52,18 @@ const onChange: TableProps<DataType>["onChange"] = (
 
 
 const ProductList: React.FC = () => {
-  const productCategories = useSelector((state) => state.products.productCategories);
+  const { data, loading } = useGetProductList()
   const [open, setOpen] = useState({
     show: false,
     type: ""
   });
-
+ 
 
   const onClick = (type: DrawerType) => setOpen((prev) => ({...prev, show: !prev.show, type}));
   const onClose = () => setOpen((prev) => ({...prev, show: !prev.show}));
   
   return (
-    <div>
+    <div className="w-full">
       <div className="flex justify-end my-4 gap-4">
         <Button type="primary" size="large" icon={<Plus />} onClick={() => onClick("form")}>
           New Product
@@ -87,10 +73,12 @@ const ProductList: React.FC = () => {
         </Button>
       </div>
 
-      <Table<DataType>
+      <Table<ProductListDataType>
         columns={columns}
-        dataSource={productListData}
+        dataSource={data}
         onChange={onChange}
+        loading={loading}
+        key={"id"}
       />
       <AddProduct onClose={onClose} open={open.show} type={open.type} />
     </div>

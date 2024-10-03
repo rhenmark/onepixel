@@ -2,12 +2,19 @@ import { Dispatch, SetStateAction } from "react";
 
 export type DrawerType = "form" | "sheet"
 
-export interface DataType {
-    key: React.Key;
+export type ProductListDataType = {
+    id: React.Key;
     name: string;
-    age: number;
-    address: string;
+    category: string;
+    description?: string;
+    price: number;
+    itemType?: string
+    imageUrl?: ProductImageURL
   }
+
+type ProductImageURL = {
+    url: string
+}
 
 export type DrawerState = {
     show: boolean;
