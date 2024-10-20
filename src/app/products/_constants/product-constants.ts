@@ -93,3 +93,16 @@ const cafeProductCategoriesGroup = [
 export const cafeProductCategories = cafeProductCategoriesGroup.map(
   (item) => item.category
 );
+
+// temporary list
+export const mockCategories = [
+"Alcoholic Beverages",
+"Breakfast Specials",
+"Coffee",
+"Desserts & Sweets",
+"Pastries & Bakery",
+"Retail Products",
+"Sandwiches & Wraps",
+"Softdrinks",
+"Tea & Infusions",
+]

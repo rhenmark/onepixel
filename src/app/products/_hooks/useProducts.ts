@@ -18,7 +18,7 @@ export const useGetCategories = () => {
   );
 
   const fetchItems = async (force?: boolean) => {
-    if (!categories.length || force) {
+    if (!categories?.length || force) {
       try {
         const querySnapshot = await getDocs(collection(db, "category"));
         const res = querySnapshot.docs.map((doc) => ({
@@ -112,7 +112,6 @@ export const useGetProductList = () => {
           imageUrl: item.fields?.imageUrl?.fields?.file
         }));
 
-        console.log("items ==>", space.items, items)
         dispatch(setProductList(items));
       })
       .catch(console.error)

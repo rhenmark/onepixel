@@ -2,11 +2,19 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { ProductStateProps } from '../product/product';
 
 export interface StoreState {
+  orderUUID?: string;
   orders: OrderProps[]
   subTotal: number
   total: number
   discount?: OrderDiscountProps
-  totalQty: number
+  totalQty: number,
+  payment: PaymentProps
+}
+
+export type PaymentProps = {
+    tenderedAmount: number;
+    amountChange: number;
+    paymentMethod: string
 }
 
 export type OrderProps = {
@@ -23,6 +31,7 @@ export type OrderDiscountProps = {
 
 
 const initialState: StoreState = {
+    orderUUID: undefined,
     orders: [],
     subTotal: 0,
     total: 0,
@@ -30,7 +39,12 @@ const initialState: StoreState = {
         name: "",
         percentage: 0
     },
-    totalQty: 0
+    totalQty: 0,
+    payment: {
+        tenderedAmount: 0,
+        amountChange: 0,
+        paymentMethod: "cash"
+    }
 }
 
 export const storeSlice = createSlice({
@@ -38,8 +52,11 @@ export const storeSlice = createSlice({
   initialState,
   reducers: {
     addOrder: (state, action: PayloadAction<ProductStateProps>) => {
-        console.log("orders ==>", state.orders)
-
+        if (!state.orderUUID) {
+            let uuid = self.crypto.randomUUID();
+            state.orderUUID = uuid;
+        }
+        
         const isExist = state.orders.find(item => item.id === action.payload.id)
         if (isExist) {
             const updatedItems = state.orders.map((item) => {
@@ -68,10 +85,38 @@ export const storeSlice = createSlice({
             state.totalQty += 1
         }
     },
+    removeOrder: (state, action) => {
+        state.orders = state.orders.map((item) => {
+            if (item.id === action.payload.id) {
+                return {
+                    ...item,
+                    qty: item.qty - 1,
+                    subTotal: item.subTotal - action.payload.price
+                }
+            }
+            return item
+        }).filter(item => item.qty)
+        state.totalQty -= 1;
+        state.subTotal = state.subTotal - action.payload.price
+    },
+    tenderAmount: (state, action) => {
+        let amountChange = Number(action.payload.tenderAmount - state.subTotal)
+        state.payment = {
+            ...state.payment,
+            tenderedAmount: 0,
+            amountChange,
+            paymentMethod: action.payload.paymentMethod
+        }
+    },
+    processPayment: (state) => {
+        const discount =  state?.discount?.percentage ? 0 : (state?.discount?.percentage / 100 ) * state.subTotal;
+        let total = Number(state.subTotal - discount)
+        state.total = total
+    }
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { addOrder } = storeSlice.actions
+export const { addOrder, removeOrder, tenderAmount, processPayment } = storeSlice.actions
 
 export default storeSlice.reducer

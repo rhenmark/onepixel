@@ -2,35 +2,25 @@
 
 import Header from "@/components/ui/header/header";
 import {
-  Button,
-  Card,
-  InputNumber,
-  List,
-  Space,
-  Spin,
   Splitter,
-  Input,
-  InputProps,
 } from "antd";
-import { Flame, MinusIcon, Plus, Snowflake } from "lucide-react";
-import Link from "next/link";
-import { useGetProductList } from "../products/_hooks/useProducts";
 import { ProductStateProps } from "@/lib/duxs/feature/product/product";
-import { useDispatch, useSelector } from "react-redux";
-import { addOrder } from "@/lib/duxs/feature/store/store";
-import { RootState } from "@/lib/duxs/store";
-import { ChangeEvent } from "react";
-import { useFilter } from "./_hooks/useFilter";
+import { useDispatch } from "react-redux";
+import { addOrder, removeOrder } from "@/lib/duxs/feature/store-pos/store-pos";
+import OrdersList from "./_components/orders";
+import ProductList from "./_components/product_list";
+import CategoryList from "./_components/category_list";
+import PaymentForm from "./_components/payment_form";
 
-const { Search } = Input;
-
-const mockPurchaseList = Array.from(Array(5), (x, i) => i + 1);
-
-function Store() {
+function StorePOS() {
   const dispatch = useDispatch();
 
   const onAddItem = (item: ProductStateProps) => {
     dispatch(addOrder(item));
+  };
+
+  const onRemoveItem = (item: ProductStateProps) => {
+    dispatch(removeOrder(item));
   };
 
   return (
@@ -45,9 +35,9 @@ function Store() {
             defaultSize="10%"
             min="10%"
             max="10%"
-            className="overflow-y-auto px-10"
+            className="overflow-y-auto overflow-x-hidden"
           >
-            <div>Categories here</div>
+            <CategoryList />
           </Splitter.Panel>
           <Splitter.Panel
             defaultSize="60%"
@@ -58,149 +48,13 @@ function Store() {
             <ProductList onAddItem={onAddItem} />
           </Splitter.Panel>
           <Splitter.Panel>
-            <OrdersList onAddItem={onAddItem} />
+            <OrdersList onAddItem={onAddItem} onRemoveItem={onRemoveItem} />
           </Splitter.Panel>
         </Splitter>
       </main>
+      <PaymentForm />
     </div>
   );
 }
 
-type ComponentProps = {
-  onAddItem: (item: ProductStateProps) => void;
-};
-
-const ProductList = ({ onAddItem }: ComponentProps) => {
-  const { data, loading } = useGetProductList();
-  const {
-    data: filteredData,
-    searchQuery,
-    setSearchQuery,
-  } = useFilter({ items: data });
-
-  const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value);
-  };
-
-  if (loading) {
-    return (
-      <div className="bg-white/20 rounded-sm grid h-full w-full place-items-center">
-        <Spin size="large" spinning />
-      </div>
-    );
-  }
-
-  return (
-    <div className="w-full">
-      <div className="mb-4">
-        <Search
-          size="large"
-          enterButton
-          placeholder="Search here"
-          onChange={handleSearch}
-          value={searchQuery}
-        />
-      </div>
-      <div className="grid grid-cols-3 gap-4 overflow-y-auto">
-        {filteredData.map((item) => (
-          <Card
-            key={item.id}
-            className="h-[200px]"
-            onClick={() => onAddItem(item)}
-          >
-            <div className="grid grid-flow-col items-center justify-between">
-              <div>
-                <span className="text-lg block">{item.name}</span>
-                <span className="font-bold text-2xl">
-                  ₱ {Number(item.price).toFixed(2)}
-                </span>
-              </div>
-              {item.itemType && (
-                <div>
-                  <span className="font-bold text-lg">
-                    {item.itemType}
-                    {item.itemType === "hot" && <Flame color="red" />}
-                    {item.itemType === "cold" && <Snowflake color="blue" />}
-                  </span>
-                </div>
-              )}
-            </div>
-          </Card>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-const OrdersList = ({ onAddItem }: ComponentProps) => {
-  const orders = useSelector((state: RootState) => state.store.orders);
-  const subTotal = useSelector((state: RootState) => state.store.subTotal);
-  const totalQty = useSelector((state: RootState) => state.store.totalQty);
-
-  return (
-    <div className="p-4 grid grid-rows-[1fr_auto] h-full">
-      <div className="h-full">
-        {/* <Empty /> */}
-        <List
-          footer={
-            <div className="text-white flex flex-col gap-2">
-              <div>Qty: {totalQty}</div>
-              <div>Less: Discount: 0</div>
-            </div>
-          }
-          // bordered
-          dataSource={orders}
-          className="grid grid-rows-[1fr_auto] h-full"
-          renderItem={(order) => (
-            <List.Item className="!px-0">
-              <div className="grid grid-flow-row text-white w-full">
-                <span className="!text-white text-lg">
-                  {order.item.name}{" "}
-                  {order.item.itemType && `(${order.item.itemType})`}
-                </span>
-                <div className="flex justify-between">
-                  <span className="font-bold">P {order.item.price}</span>
-                  <span className="font-bold">
-                    P {Number(order.subTotal).toFixed(2)}
-                  </span>
-                </div>
-              </div>
-              <div className="grid place-items-center grid-flow-col">
-                <Space.Compact style={{ width: "70%" }}>
-                  <Button size="large" variant="solid" icon={<MinusIcon />} />
-                  <InputNumber
-                    min={0}
-                    value={order.qty}
-                    max={100}
-                    size="large"
-                    readOnly
-                  />
-                  <Button
-                    type="primary"
-                    size="large"
-                    icon={<Plus />}
-                    onClick={() => onAddItem(order.item)}
-                  />
-                </Space.Compact>
-              </div>
-            </List.Item>
-          )}
-          size="large"
-        />
-      </div>
-      <div className="h-full">
-        <span>QTY: </span>
-        <Link
-          href="/store/pay"
-          className="!h-20 flex flex-row justify-between items-center w-full bg-primary text-white px-4 rounded-md"
-        >
-          <span className="block float-left text-xl">Pay</span>
-          <span className="block text-2xl font-bold">
-            PHP {Number(subTotal).toFixed(2)}
-          </span>
-        </Link>
-      </div>
-    </div>
-  );
-};
-export default Store;
+export default StorePOS;

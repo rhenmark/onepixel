@@ -1,12 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit'
 import productReducer from './feature/product/product'
-import storeReducer from './feature/store/store'
+import storePosReducer from './feature/store-pos/store-pos'
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       products: productReducer,
-      store: storeReducer
+      storePOS: storePosReducer
     },
     devTools: true
   })

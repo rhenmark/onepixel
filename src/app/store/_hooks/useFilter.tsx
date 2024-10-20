@@ -1,4 +1,5 @@
 import { ProductStateProps } from "@/lib/duxs/feature/product/product";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 type UseFilterProps = {
@@ -7,6 +8,12 @@ type UseFilterProps = {
 
 export const useFilter = ({ items }: UseFilterProps) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const searchParams = useSearchParams();
+  const categoryFilter = searchParams.get("category") || "All";
+
+  if (!categoryFilter || categoryFilter !== "All") {
+    items = items.filter((item) => item.category === categoryFilter);
+  }
 
   let filteredData = searchQuery
     ? items.filter((item) =>
@@ -17,6 +24,6 @@ export const useFilter = ({ items }: UseFilterProps) => {
   return {
     data: filteredData,
     setSearchQuery,
-    searchQuery
+    searchQuery,
   };
 };
