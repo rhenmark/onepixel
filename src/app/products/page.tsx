@@ -6,6 +6,7 @@ import ProductList from "./_components/product-list";
 import ProductCategories from "./_components/product-categories";
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Loading from "./loading";
 
 const ProductsContent = () => {
   const [activeKey, setActiveKey] = useState("1");
@@ -59,7 +60,7 @@ const items: TabsProps["items"] = [
 
 const Products = () => {
   return (
-    <Suspense>
+    <Suspense fallback={<Loading />}>
       <ProductsContent />
     </Suspense>
   );

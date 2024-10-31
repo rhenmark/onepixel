@@ -1,6 +1,5 @@
 "use client"
 
-import { EyeOutlined } from "@ant-design/icons";
 import { Button, Card, Divider, Input } from "antd";
 import { useRouter } from "next/navigation";
 import { FormEvent, Key } from "react";
@@ -9,11 +8,6 @@ const appName = "ONEPIXEL"
 function Login() {
     const router = useRouter()
     
-    
-    const handleEyeClick = () => {
-        // alert('eye')
-    }
-
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault()
         router.push("/dashboard")

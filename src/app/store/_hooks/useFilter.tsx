@@ -15,7 +15,7 @@ export const useFilter = ({ items }: UseFilterProps) => {
     items = items.filter((item) => item.category === categoryFilter);
   }
 
-  let filteredData = searchQuery
+  const filteredData = searchQuery
     ? items.filter((item) =>
         item.name.toLocaleLowerCase().includes(searchQuery.toLocaleLowerCase())
       )

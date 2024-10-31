@@ -1,6 +1,6 @@
-import { CategoryDataType, DataType } from "../_types/product.types";
+// import { CategoryDataType, DataType } from "../_types/product.types";
 
-export const productListData: DataType[] = [
+export const productListData = [
     {
       key: "1",
       name: "John Brown",
@@ -27,7 +27,7 @@ export const productListData: DataType[] = [
     },
   ];
 
-export const productCategoryData: CategoryDataType[] = [
+export const productCategoryData = [
   {
     key: "1",
     name: "John Brown",

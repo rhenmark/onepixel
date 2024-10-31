@@ -1,9 +1,17 @@
-import { MenuProps, Dropdown } from "antd";
-import { Banknote, CreditCard } from "lucide-react";
-import { useState } from "react";
-import { Key } from "readline";
+"use client";
 
-const options: MenuProps["items"] = [
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import { Dropdown } from "antd";
+import { Banknote, CreditCard, Wallet } from "lucide-react";
+import { ReactNode, useState } from "react";
+
+interface MenuOptions {
+  icon: ReactNode
+  key: string
+  label: string
+}
+
+const options: MenuOptions[] = [
     {
       key: "cash",
       label: "Cash",
@@ -14,15 +22,28 @@ const options: MenuProps["items"] = [
       label: "Card",
       icon: <CreditCard />,
     },
+    {
+      key: "gcash",
+      label: "GCash",
+      icon: <Wallet />,
+    },
+    {
+      key: "maya",
+      label: "Maya",
+      icon: <Wallet />,
+    },
   ];
   
   const SelectWithImage = () => {
-    const [selectedPayment, setSelectedPayment] = useState(options[0]);
+    const [selectedPayment, setSelectedPayment] = useState<MenuOptions>(options[0]);
   
-    const onClick = (item: { key: Key | undefined }) => {
-      const selected = options.find((x) => x?.key === item.key);
+    const onClick = (item: unknown ) => {
+      // @ts-ignore eslint-ignore-next-line 
+      const selected: unknown = options.find((x) => x?.key === item.key);
+       // @ts-ignore eslint-ignore-next-line 
       if (selected) setSelectedPayment(selected);
     };
+
     return (
       <Dropdown
         menu={{
@@ -32,6 +53,7 @@ const options: MenuProps["items"] = [
           onClick,
         }}
         className="py-4 px-6 bg-black/20"
+        overlayClassName="w-[240px]"
         openClassName="p-8"
       >
         <div className="flex flex-row gap-2">

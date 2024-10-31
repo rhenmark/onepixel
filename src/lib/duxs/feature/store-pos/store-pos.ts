@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { ProductStateProps } from '../product/product';
+import { generateUUID } from '@/util/crypto';
 
 export interface StoreState {
   orderUUID?: string;
@@ -25,7 +26,7 @@ export type OrderProps = {
 }
 
 export type OrderDiscountProps = {
-    name: string
+    code: string
     percentage: number
 }
 
@@ -36,7 +37,7 @@ const initialState: StoreState = {
     subTotal: 0,
     total: 0,
     discount: {
-        name: "",
+        code: "",
         percentage: 0
     },
     totalQty: 0,
@@ -52,8 +53,8 @@ export const storeSlice = createSlice({
   initialState,
   reducers: {
     addOrder: (state, action: PayloadAction<ProductStateProps>) => {
-        if (!state.orderUUID) {
-            let uuid = self.crypto.randomUUID();
+        if (!state.orderUUID ) {
+            const uuid = generateUUID();
             state.orderUUID = uuid;
         }
         
@@ -100,7 +101,7 @@ export const storeSlice = createSlice({
         state.subTotal = state.subTotal - action.payload.price
     },
     tenderAmount: (state, action) => {
-        let amountChange = Number(action.payload.tenderAmount - state.subTotal)
+        const amountChange = Number(action.payload.tenderAmount - state.subTotal)
         state.payment = {
             ...state.payment,
             tenderedAmount: 0,
@@ -109,14 +110,28 @@ export const storeSlice = createSlice({
         }
     },
     processPayment: (state) => {
-        const discount =  state?.discount?.percentage ? 0 : (state?.discount?.percentage / 100 ) * state.subTotal;
-        let total = Number(state.subTotal - discount)
+        const discount = state?.discount?.percentage ? 0 : (state?.discount?.percentage || 0 / 100 ) * state.subTotal;
+        const total = Number(state.subTotal - discount)
         state.total = total
+    },
+    applyDiscount: (state, action) => {
+        state.discount = action.payload.discount
+
+        const discount = action.payload.discount?.percentage  / 100  * state.subTotal;
+        const total = Number(state.subTotal - discount)
+        state.total = total
+    },
+    placeOrder: () => {
+
+    },
+    cancelPayment: (state) => {
+        state.discount = initialState.discount
+        state.payment  = initialState.payment
     }
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { addOrder, removeOrder, tenderAmount, processPayment } = storeSlice.actions
+export const { addOrder, removeOrder, tenderAmount, processPayment, applyDiscount, placeOrder, cancelPayment } = storeSlice.actions
 
 export default storeSlice.reducer

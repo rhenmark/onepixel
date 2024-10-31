@@ -12,7 +12,6 @@ import Dragger from "antd/es/upload/Dragger";
 import { Download, Upload } from "lucide-react";
 import { useSelector } from "react-redux";
 import {read, utils} from "xlsx";
-import { useGetCategories } from "../_hooks/useProducts";
 import {
   ProductCategoryStateProps,
 } from "@/lib/duxs/feature/product/product";
@@ -23,10 +22,10 @@ const { TextArea } = Input;
 
 const AddProduct = ({ onClose, open, type }: AddProductProps) => {
     const {
-        register,
+        // register,
         handleSubmit,
-        watch,
-        formState: { errors },
+        // watch,
+        // formState: { errors },
       } = useForm<FormInputs>()
 
   const drawerTitle = useMemo(() => {
@@ -37,15 +36,17 @@ const AddProduct = ({ onClose, open, type }: AddProductProps) => {
     return type === "form" ? <Form /> : <ImportForm />;
   }, [type]);
 
+  const obSubmit = handleSubmit((data) => console.log(data))
+
   return (
-    <form>
+    <form onSubmit={obSubmit}>
         <Drawer
         title={drawerTitle}
         onClose={onClose}
         open={open}
         size="large"
         maskClosable={false}
-        footer={<Footer onClose={onClose} onSubmit={handleSubmit} />}
+        footer={<Footer onClose={onClose}  />}
         >
         {formComponent}
         </Drawer>
@@ -68,7 +69,6 @@ const Form = () => {
     value: item.id,
     label: item.name,
   }));
-  const _ = useGetCategories();
 
   return (
     <div className="grid gap-4">
@@ -105,7 +105,7 @@ const Form = () => {
 };
 
 const ImportForm = () => {
-  const [sheet, setSheet] = useState({
+  const [sheet, setSheet] = useState<{data: unknown[], step: number}>({
     data: [],
     step: 0,
   });
@@ -114,15 +114,15 @@ const ImportForm = () => {
 
     // Process file after reading
     reader.onload = (event) => {
-      const data = event.target.result;
+      const data = event?.target?.result;
       const workbook = read(data, { type: "binary" });
       const sheetName = workbook.SheetNames[0]; // Get the first sheet
       const sheet = workbook.Sheets[sheetName];
 
       // Parse the sheet to JSON
-      const jsonData = utils.sheet_to_json(sheet);
+      const jsonData = utils.sheet_to_json(sheet) || [];
       setSheet({
-        data: jsonData,
+        data: jsonData || [],
         step: 1,
       });
       console.log("Parsed Data:", jsonData); // Handle your parsed data here
@@ -196,16 +196,16 @@ const ProductTable = ({ onBack }: ProductTableProps) => {
 
 
 type FooterProps = Pick<AddProductProps, "onClose"> & {
-    onSubmit: () => void
+    onSubmit?: () => void
 }
 
-const Footer = ({ onClose, onSubmit }: FooterProps) => {
+const Footer = ({ onClose }: FooterProps) => {
   return (
     <div className="flex justify-end gap-4 h-16 px-4">
       <Button size="large" onClick={onClose}>
         Cancel
       </Button>
-      <Button size="large" type="primary" htmlType="submit" onClick={onSubmit}>
+      <Button size="large" type="primary" htmlType="submit">
         Submit
       </Button>
     </div>

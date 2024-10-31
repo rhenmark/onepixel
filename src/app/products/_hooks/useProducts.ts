@@ -6,18 +6,18 @@ import {
 } from "@/lib/duxs/feature/product/product";
 import { RootState } from "@/lib/duxs/store";
 import { getDocs, collection, writeBatch, doc } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 export const useGetCategories = () => {
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<any>([]);
+  const [data, setData] = useState<unknown[]>([]);
   const dispatch = useDispatch();
   const categories = useSelector(
     (state: RootState) => state.products.productCategories
   );
 
-  const fetchItems = async (force?: boolean) => {
+  const fetchItems = useCallback(async (force?: boolean) => {
     if (!categories?.length || force) {
       try {
         const querySnapshot = await getDocs(collection(db, "category"));
@@ -32,11 +32,11 @@ export const useGetCategories = () => {
         setLoading(false);
       }
     }
-  };
+  }, [categories?.length, dispatch]);
 
   useEffect(() => {
     fetchItems();
-  }, []);
+  }, [fetchItems]);
 
   const refetch = () => {
     fetchItems(true);
@@ -51,7 +51,7 @@ export const useGetCategories = () => {
 
 export const useAddCategories = () => {
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<any>([]);
+  const [data] = useState([]);
   const [error, setError] = useState<null | string>();
   const { refetch } = useGetCategories();
 
@@ -64,9 +64,9 @@ export const useAddCategories = () => {
     // Iterate through the data array and add each one to the batch
     categories
       .map((item) => ({ name: item, isActive: true }))
-      .forEach((data) => {
+      .forEach((res) => {
         const newDocRef = doc(usersRef); // Auto-generate document ID
-        batch.set(newDocRef, data); // Add each document to the batch
+        batch.set(newDocRef, res); // Add each document to the batch
       });
 
     // Commit the batch operation
@@ -109,7 +109,8 @@ export const useGetProductList = () => {
           key: item.sys.id,
           id: item.sys.id,
           price: Number(item.fields.price || 0).toFixed(2),
-          imageUrl: item.fields?.imageUrl?.fields?.file
+          // eslint-disable-next-line 
+          imageUrl: item.fields?.imageUrl
         }));
 
         dispatch(setProductList(items));

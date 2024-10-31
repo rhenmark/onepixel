@@ -1,5 +1,5 @@
 import { Button, Divider, Drawer, Input, List, notification } from "antd";
-import { AddProductCategoryFooterProps, AddProductCategoryProps, CategoryFormStateProps } from "../_types/product.types";
+import { AddProductCategoryFooterProps, AddProductCategoryProps } from "../_types/product.types";
 import { BetweenHorizontalStart, Minus, Plus } from "lucide-react";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { cafeProductCategories } from "../_constants/product-constants";

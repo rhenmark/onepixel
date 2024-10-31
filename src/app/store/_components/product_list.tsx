@@ -1,3 +1,5 @@
+"use client";
+
 import { useGetProductList } from "@/app/products/_hooks/useProducts";
 import { Spin, List, Empty, Card, Input } from "antd";
 import {  Flame, Snowflake } from "lucide-react";

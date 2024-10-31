@@ -1,3 +1,5 @@
+"use client";
+
 import { formattedNumber } from "@/util/formatter/currency";
 import { List, Empty, Space, Button, InputNumber } from "antd";
 import { MinusIcon, Plus } from "lucide-react";
@@ -27,9 +29,9 @@ const OrdersList = ({ onAddItem, onRemoveItem }: ComponentProps) => {
         <div className="h-full max-h-full overflow-y-auto">
           <List
             footer={
-              <div className="text-white flex flex-col gap-2">
+              <div className="text-white">
                 <div className="font-semibold">Qty: {totalQty}</div>
-                <div className="font-semibold">Less (Discount): 0</div>
+                {/* <div className="font-semibold">Less (Discount): 0</div> */}
               </div>
             }
             locale={{

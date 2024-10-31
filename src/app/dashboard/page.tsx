@@ -2,12 +2,13 @@
 
 import Header from "@/components/ui/header/header";
 import { Card } from "antd";
-import { Airplay, PackageOpen, Percent, PieChart, PrinterCheck, ScanBarcode } from "lucide-react";
+import { Airplay, ChefHat, PackageOpen, Percent, PieChart, PrinterCheck, ScanBarcode } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const mockRoutesList = [
   { name: "Store POS", route: "/store", icon: <Airplay size={80} /> },
   { name: "Online Orders", route: "/online-orders", icon: <PrinterCheck size={80} /> },
+  { name: "Kitchen", route: "/kitchen", icon: <ChefHat size={80} /> },
   { name: "Products", route: "/products", icon: <PackageOpen size={80} /> },
   { name: "Inventory", route: "/inventory", icon: <ScanBarcode size={80} /> },
   { name: "Reports", route: "/reports", icon: <PieChart size={80} /> },

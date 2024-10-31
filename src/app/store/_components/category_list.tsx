@@ -1,3 +1,5 @@
+"use client";
+
 import { mockCategories } from "@/app/products/_constants/product-constants";
 import { List, Tooltip, Button } from "antd";
 import { useRouter, useSearchParams } from "next/navigation";
